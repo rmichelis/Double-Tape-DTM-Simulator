@@ -1,0 +1,17 @@
+;Put us into the correct start state
+0 * * * * * * copy0
+
+; copy0: copies 0’s from tape#1 to tape#2
+copy0 0 _ 0 0 R R copy0
+copy0 1 _ * * R * copy0
+copy0 _ _ * * L L compare
+; compare: matches 1s on tape#1 with 0s on tape#2
+compare 1 0 * * L L compare
+compare 0 * * * L * compare
+; same number
+compare _ _ * * * * halt-accept
+; more 1s than 0s
+compare * _ * * * * halt-reject
+; more 0s than 1s
+compare _ * * * * * halt-reject
+
