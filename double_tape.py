@@ -119,11 +119,8 @@ if __name__ == '__main__':
     for i in range(tape_head2, tape_head2 + len(input_string2)):
         tape2[i] = input_string2[i - tape_head2]
 
-    # Our initial state
+    # Expected initial state
     state = "0"
-    if state not in tm_struct:
-        print("Incorrect start state; TM must start in state '0'")
-        exit()
 
     # Print the tape
     print_tape(tape1, tape_head1, tape2, tape_head2, state, on_screen_tape)
@@ -139,33 +136,66 @@ if __name__ == '__main__':
         # Sorry that this is slightly messy and probably not optimised,
         # it goes through and deals with any asterisk rules and parsing
         # out what rule should be used at any given transition
-        if ((old_sym1, old_sym2)) in tm_struct[old_state]:
-            new_sym1 = tm_struct[old_state][((old_sym1, old_sym2))]['new_symbol1']
-            new_sym2 = tm_struct[old_state][((old_sym1, old_sym2))]['new_symbol2']
-            this_dir1 = tm_struct[old_state][((old_sym1, old_sym2))]['direction1']
-            this_dir2 = tm_struct[old_state][((old_sym1, old_sym2))]['direction2']
-            state = tm_struct[old_state][((old_sym1, old_sym2))]['new_state']
-        elif (('*', old_sym2)) in tm_struct[state]:
-            new_sym1 = tm_struct[old_state][(('*', old_sym2))]['new_symbol1']
-            new_sym2 = tm_struct[old_state][(('*', old_sym2))]['new_symbol2']
-            this_dir1 = tm_struct[old_state][(('*', old_sym2))]['direction1']
-            this_dir2 = tm_struct[old_state][(('*', old_sym2))]['direction2']
-            state = tm_struct[old_state][(('*', old_sym2))]['new_state']
-        elif ((old_sym1, '*')) in tm_struct[state]:
-            new_sym1 = tm_struct[old_state][((old_sym1, '*'))]['new_symbol1']
-            new_sym2 = tm_struct[old_state][((old_sym1, '*'))]['new_symbol2']
-            this_dir1 = tm_struct[old_state][((old_sym1, '*'))]['direction1']
-            this_dir2 = tm_struct[old_state][((old_sym1, '*'))]['direction2']
-            state = tm_struct[old_state][((old_sym1, '*'))]['new_state']
-        elif (('*', '*')) in tm_struct[state]:
-            new_sym1 = tm_struct[old_state][(('*', '*'))]['new_symbol1']
-            new_sym2 = tm_struct[old_state][(('*', '*'))]['new_symbol2']
-            this_dir1 = tm_struct[old_state][(('*', '*'))]['direction1']
-            this_dir2 = tm_struct[old_state][(('*', '*'))]['direction2']
-            state = tm_struct[old_state][(('*', '*'))]['new_state']
+        if old_state in tm_struct:
+            if ((old_sym1, old_sym2)) in tm_struct[old_state]:
+                new_sym1 = tm_struct[old_state][((old_sym1, old_sym2))]['new_symbol1']
+                new_sym2 = tm_struct[old_state][((old_sym1, old_sym2))]['new_symbol2']
+                this_dir1 = tm_struct[old_state][((old_sym1, old_sym2))]['direction1']
+                this_dir2 = tm_struct[old_state][((old_sym1, old_sym2))]['direction2']
+                state = tm_struct[old_state][((old_sym1, old_sym2))]['new_state']
+            elif ((old_sym1, '*')) in tm_struct[state]:
+                new_sym1 = tm_struct[old_state][((old_sym1, '*'))]['new_symbol1']
+                new_sym2 = tm_struct[old_state][((old_sym1, '*'))]['new_symbol2']
+                this_dir1 = tm_struct[old_state][((old_sym1, '*'))]['direction1']
+                this_dir2 = tm_struct[old_state][((old_sym1, '*'))]['direction2']
+                state = tm_struct[old_state][((old_sym1, '*'))]['new_state']
+            elif (('*', old_sym2)) in tm_struct[state]:
+                new_sym1 = tm_struct[old_state][(('*', old_sym2))]['new_symbol1']
+                new_sym2 = tm_struct[old_state][(('*', old_sym2))]['new_symbol2']
+                this_dir1 = tm_struct[old_state][(('*', old_sym2))]['direction1']
+                this_dir2 = tm_struct[old_state][(('*', old_sym2))]['direction2']
+                state = tm_struct[old_state][(('*', old_sym2))]['new_state']
+            elif (('*', '*')) in tm_struct[state]:
+                new_sym1 = tm_struct[old_state][(('*', '*'))]['new_symbol1']
+                new_sym2 = tm_struct[old_state][(('*', '*'))]['new_symbol2']
+                this_dir1 = tm_struct[old_state][(('*', '*'))]['direction1']
+                this_dir2 = tm_struct[old_state][(('*', '*'))]['direction2']
+                state = tm_struct[old_state][(('*', '*'))]['new_state']
+            else:
+                print(f'TM underspecified: No rule for state {old_state} symbols {old_sym1}, {old_sym2}')
+                exit()
+        elif '*' in tm_struct:
+            if ((old_sym1, old_sym2)) in tm_struct['*']:
+                new_sym1 = tm_struct['*'][((old_sym1, old_sym2))]['new_symbol1']
+                new_sym2 = tm_struct['*'][((old_sym1, old_sym2))]['new_symbol2']
+                this_dir1 = tm_struct['*'][((old_sym1, old_sym2))]['direction1']
+                this_dir2 = tm_struct['*'][((old_sym1, old_sym2))]['direction2']
+                state = tm_struct['*'][((old_sym1, old_sym2))]['new_state']
+            elif ((old_sym1, '*')) in tm_struct['*']:
+                new_sym1 = tm_struct['*'][((old_sym1, '*'))]['new_symbol1']
+                new_sym2 = tm_struct['*'][((old_sym1, '*'))]['new_symbol2']
+                this_dir1 = tm_struct['*'][((old_sym1, '*'))]['direction1']
+                this_dir2 = tm_struct['*'][((old_sym1, '*'))]['direction2']
+                state = tm_struct['*'][((old_sym1, '*'))]['new_state']
+            elif (('*', old_sym2)) in tm_struct['*']:
+                new_sym1 = tm_struct['*'][(('*', old_sym2))]['new_symbol1']
+                new_sym2 = tm_struct['*'][(('*', old_sym2))]['new_symbol2']
+                this_dir1 = tm_struct['*'][(('*', old_sym2))]['direction1']
+                this_dir2 = tm_struct['*'][(('*', old_sym2))]['direction2']
+                state = tm_struct['*'][(('*', old_sym2))]['new_state']
+            elif (('*', '*')) in tm_struct['*']:
+                new_sym1 = tm_struct['*'][(('*', '*'))]['new_symbol1']
+                new_sym2 = tm_struct['*'][(('*', '*'))]['new_symbol2']
+                this_dir1 = tm_struct['*'][(('*', '*'))]['direction1']
+                this_dir2 = tm_struct['*'][(('*', '*'))]['direction2']
+                state = tm_struct['*'][(('*', '*'))]['new_state']
+            else:
+                print(f'TM underspecified: No rule for state {old_state} symbols {old_sym1}, {old_sym2}')
+                exit()
         else:
-            print('halt-underspecified')
+            print(f'TM underspecified: No rule for state {old_state} symbols {old_sym1}, {old_sym2}')
             exit()
+
 
         # Write new symbol to the tape.
         if new_sym1 != '*':
